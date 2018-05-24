@@ -6,4 +6,4 @@ if [ -x test.wasm ]; then
 fi
 
 GOROOT=$HOME/go-wasm
-GOOS=js GOARCH=wasm $HOME/go-wasm/bin/go build -o test.wasm test.go
+GOOS=js GOARCH=wasm $HOME/go-wasm/bin/go build -o app.wasm app.go
