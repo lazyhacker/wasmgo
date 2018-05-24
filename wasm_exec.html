@@ -9,46 +9,69 @@ license that can be found in the LICENSE file.
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest.json">
     <title>Go WASM</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css" />
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="382738875097-lq9eusp94to8lgbfrl0h3omta4uktcch.apps.googleusercontent.com">
+    <script src="wasm_exec.js"></script>
+    <script>
+            if (!WebAssembly.instantiateStreaming) { // polyfill
+                    WebAssembly.instantiateStreaming = async (resp, importObject) => {
+                            const source = await (await resp).arrayBuffer();
+                            return await WebAssembly.instantiate(source, importObject);
+                    };
+            }
+
+            const go = new Go();
+            let mod, inst;
+            WebAssembly.instantiateStreaming(fetch("test.wasm", {credentials: 'include'}), go.importObject).then((result) => {
+                    mod = result.module;
+                    inst = result.instance;
+                    document.getElementById("runButton").disabled = false;
+            });
+
+            async function run() {
+                    console.clear();
+                    await go.run(inst);
+                    inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+            }
+    </script>
+
+    <script>
+      function onSignIn(googleUser) {
+	var profile = googleUser.getBasicProfile();
+	console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+	console.log('Name: ' + profile.getName());
+	console.log('Image URL: ' + profile.getImageUrl());
+	console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+      }
+    </script>
 </head>
 
 <body>
-	<script src="wasm_exec.js"></script>
-	<script>
-		if (!WebAssembly.instantiateStreaming) { // polyfill
-			WebAssembly.instantiateStreaming = async (resp, importObject) => {
-				const source = await (await resp).arrayBuffer();
-				return await WebAssembly.instantiate(source, importObject);
-			};
-		}
 
-		const go = new Go();
-		let mod, inst;
-                WebAssembly.instantiateStreaming(fetch("test.wasm", {credentials: 'include'}), go.importObject).then((result) => {
-			mod = result.module;
-			inst = result.instance;
-			document.getElementById("runButton").disabled = false;
-		});
-
-		async function run() {
-			console.clear();
-			await go.run(inst);
-			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
-		}
-	</script>
-
-	<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onClick="run();" id="runButton" disabled>Run</button>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onClick="run();" id="runButton" disabled>Run</button>
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onClick="alert('button pushed')">Alert</button>
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="quit">Quit</button>
     <form action="#">
-    <div class="mdl-textfield mdl-js-textfield">
-        <input class="mdl-textfield__input" type="text" id="sample1">
-        <label class="mdl-textfield__label" for="sample1">Text...</label>
-    </div>
+      <div class="mdl-textfield mdl-js-textfield">
+          <input class="mdl-textfield__input" type="text" id="sample1">
+          <label class="mdl-textfield__label" for="sample1">Text...</label>
+      </div>
     </form>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <a href="#" onclick="signOut();">Sign out</a>
+    <script>
+      function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+          console.log('User signed out.');
+        });
+      }
+    </script>
 </body>
 
 </html>
