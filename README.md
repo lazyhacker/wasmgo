@@ -32,5 +32,5 @@ Start the server from the repo directory. By default the server listens on port 
 $ go run server.go
 ```
 
-Connect to the app by navigating to [localhost:8080/wasm_exec.html](http://localhost:8080/wasm_exec.html).
+Connect to the app by navigating to [localhost:8080](http://localhost:8080/).
 
