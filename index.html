@@ -13,33 +13,13 @@ license that can be found in the LICENSE file.
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css" />
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="go_wasm_exec.js"></script>
+    <script>
+        load_wasm("test.wasm");
+    </script>
 </head>
 
 <body>
-	<script src="wasm_exec.js"></script>
-	<script>
-		if (!WebAssembly.instantiateStreaming) { // polyfill
-			WebAssembly.instantiateStreaming = async (resp, importObject) => {
-				const source = await (await resp).arrayBuffer();
-				return await WebAssembly.instantiate(source, importObject);
-			};
-		}
-
-		const go = new Go();
-		let mod, inst;
-		WebAssembly.instantiateStreaming(fetch("test.wasm"), go.importObject).then((result) => {
-			mod = result.module;
-			inst = result.instance;
-			document.getElementById("runButton").disabled = false;
-		});
-
-		async function run() {
-			console.clear();
-			await go.run(inst);
-			inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
-		}
-	</script>
-
 	<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onClick="run();" id="runButton" disabled>Run</button>
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onClick="alert('button pushed')">Alert</button>
     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="quit">Quit</button>
