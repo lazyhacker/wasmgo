@@ -8,7 +8,11 @@ license that can be found in the LICENSE file.
 
 <head>
 	<meta charset="utf-8">
-	<title>Go wasm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Go WASM</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
 </head>
 
 <body>
@@ -36,11 +40,15 @@ license that can be found in the LICENSE file.
 		}
 	</script>
 
-	<button onClick="run();" id="runButton" disabled>Run</button>
-    <button onClick="alert('button pushed')">Alert</button>
-    <button id="quit">Quit</button>
-
-    <input type="text" id="inputbox"></input>
+	<button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onClick="run();" id="runButton" disabled>Run</button>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" onClick="alert('button pushed')">Alert</button>
+    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" id="quit">Quit</button>
+    <form action="#">
+    <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" id="sample1">
+        <label class="mdl-textfield__label" for="sample1">Text...</label>
+    </div>
+    </form>
 </body>
 
 </html>
