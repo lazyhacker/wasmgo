@@ -1,8 +1,9 @@
 package main
 
 import (
-	"lazyhackergo.com/browswer"
 	"syscall/js"
+
+	"lazyhackergo.com/browser"
 )
 
 var signal = make(chan int)
@@ -20,7 +21,7 @@ func quitCallback(e js.Value) {
 
 func keepalive() {
 	for {
-		m := <- signal
+		m := <-signal
 		if m == 0 {
 			println("quit signal received")
 			break
@@ -29,7 +30,7 @@ func keepalive() {
 }
 
 func main() {
-	q := js.NewClientCallback(false, false, false, quitCallback)
+	q := js.NewEventCallback(false, false, false, quitCallback)
 	defer q.Close()
 
 	c := js.NewCallback(cb)
@@ -38,9 +39,9 @@ func main() {
 
 	js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
 
-	window := browswer.Window()
+	window := browser.Window()
 
-	window.Alert("hello, browswer")
+	window.Alert("hello, browser")
 	window.Console.Info("hello, browser console")
 
 	keepalive()
