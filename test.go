@@ -35,11 +35,13 @@ func main() {
 
 	c := js.NewCallback(cb)
 	defer c.Close()
-	js.ValueOf(c).Invoke()
-
-	js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
+	browser.Invoke(c)
+	//js.ValueOf(c).Invoke()
 
 	window := browser.Window()
+
+	window.Document.GetElementById("quit").AddEventListener(browser.EventClick, q)
+	//js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
 
 	window.Alert("hello, browser")
 	window.Console.Info("hello, browser console")
