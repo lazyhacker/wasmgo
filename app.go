@@ -1,48 +1,50 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
+	"time"
 
-	"lazyhackergo.com/browser"
+	"lazyhackergo.com/wasmgo/lib/browser"
 )
 
 var signal = make(chan int)
-
-func cb(args []js.Value) {
-	println("callback")
-}
-
-func quitCallback(e js.Value) {
-	window := browser.Window()
-	window.Alert("Imma quiting!")
-	println("got event callback!")
-	signal <- 0
-}
-
-func keepalive() {
-	for {
-		m := <-signal
-		if m == 0 {
-			println("quit signal received")
-			break
-		}
-	}
-}
+var counter int
 
 func main() {
-	q := js.NewEventCallback(false, false, false, quitCallback)
-	defer q.Close()
-
-	c := js.NewCallback(cb)
-	defer c.Close()
-	js.ValueOf(c).Invoke()
-
-	js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
-
 	window := browser.Window()
+	window.Console.Info("go main() started")
 
-	window.Alert("hello, browser")
-	window.Console.Info("hello, browser console")
+	done := browser.Sometime(func(_ []js.Value) {
+		println("a callback")
+	})
+	defer done()
 
-	keepalive()
+	// Increment button
+	done = browser.OnClick("increment", func(e js.Value) {
+		counter++
+		browser.Set("counter", "textContent", fmt.Sprint(counter))
+	})
+	defer done()
+
+	done = browser.OnClick("alert", func(e js.Value) {
+		window.Alert("alert button pressed")
+	})
+	defer done()
+
+	window.Console.Info("starting ping goroutine")
+	go func() {
+		clock := 0
+		for {
+			time.Sleep(1 * time.Second)
+			browser.Set("pings", "textContent", fmt.Sprintf("Goroutine clock has run for %d seconds", clock))
+			clock++
+		}
+	}()
+	window.Console.Info("ping goroutine started")
+
+	// Keep-alive (when all gorountines are blocked, Go yields back to JS)
+	browser.ServeForever()
+
+	window.Console.Info("go main() terminating")
 }

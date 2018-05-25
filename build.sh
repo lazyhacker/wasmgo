@@ -1,8 +1,8 @@
 #!/bin/sh
 
 
-if [ -x test.wasm ]; then
-    rm test.wasm
+if [ -x app.wasm ]; then
+    rm app.wasm
 fi
 
 GOROOT=$HOME/go-wasm

@@ -26,6 +26,12 @@ See https://blog.lazyhacker.com/2018/05/webassembly-wasm-with-go.html for detail
 
 # Start up
 
+Build the WASM app:
+
+```bash
+$ ./build.sh
+```
+
 Start the server from the repo directory. By default the server listens on port 8080.
 
 ```bash
