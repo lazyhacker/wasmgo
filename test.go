@@ -12,10 +12,8 @@ func cb(args []js.Value) {
 	println("callback")
 }
 
-func quitCallback(e js.Value) {
-	window := browser.Window()
-	window.Alert("Imma quiting!")
-	println("got event callback!")
+func cbQuit(e js.Value) {
+	println("got Quit event callback!")
 	signal <- 0
 }
 
@@ -30,7 +28,7 @@ func keepalive() {
 }
 
 func main() {
-	q := js.NewEventCallback(false, false, false, quitCallback)
+	q := js.NewEventCallback(false, false, false, cbQuit)
 	defer q.Close()
 
 	c := js.NewCallback(cb)
