@@ -37,7 +37,7 @@ func main() {
 	browser.Invoke(c)
 	//js.ValueOf(c).Invoke()
 
-	window := browser.Window()
+	window := browser.GetWindow()
 
 	window.Document.GetElementById("quit").AddEventListener(browser.EventClick, q)
 	//js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
