@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"syscall/js"
 
 	"lazyhackergo.com/browser"
@@ -38,21 +39,19 @@ func main() {
 
 	window := browser.Window()
 
-	window.Document.GetElementById("quit", browser.ElementButton).AddEventListener(browser.EventClick, q)
+	window.Document.GetElementById("quit").AddEventListener(browser.EventClick, q)
 	//js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
 
 	window.Alert("hello, browser")
 	window.Console.Info("hello, browser console")
 
-	/*
-		canvas, err := window.Document.GetElementById("testcanvas", browser.ElementCanvas).ToCanvas()
-		if err != nil {
-			window.Console.Warn(err.Error())
-		}
+	canvas, err := window.Document.GetElementById("testcanvas").ToCanvas()
+	if err != nil {
+		window.Console.Warn(err.Error())
+	}
 
-		canvas.BeginPath()
-		canvas.Arc(100, 75, 50, 0, 2*math.Pi, false)
-		canvas.Stroke()
-	*/
+	canvas.BeginPath()
+	canvas.Arc(100, 75, 50, 0, 2*math.Pi, false)
+	canvas.Stroke()
 	keepalive()
 }
