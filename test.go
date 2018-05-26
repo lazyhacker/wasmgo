@@ -17,6 +17,9 @@ func cb(args []js.Value) {
 
 func cbQuit(e js.Value) {
 	println("got Quit event callback!")
+	window := browser.GetWindow()
+	window.Document.GetElementById("runButton").SetProperty("disabled", false)
+	window.Document.GetElementById("quit").SetAttribute("disabled", true)
 	signal <- 0
 }
 
@@ -41,7 +44,10 @@ func main() {
 
 	window := browser.GetWindow()
 
+	window.Document.GetElementById("runButton").SetAttribute("disabled", true)
+
 	window.Document.GetElementById("quit").AddEventListener(browser.EventClick, q)
+	window.Document.GetElementById("quit").SetProperty("disabled", false)
 	//js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
 
 	window.Alert("Triggered from Go WASM module")
@@ -60,12 +66,15 @@ func main() {
 
 	time.Sleep(5 * time.Second)
 	go func() {
-		for i := 0; i < 100; i++ {
+		for i := 0; i < 10; i++ {
 
 			canvas.Clear()
 			canvas.FillText(strconv.Itoa(i), 10, 50)
 			time.Sleep(1 * time.Second) // sleep allows the browser to take control otherwise the whole UI gets frozen.
 		}
+		canvas.Clear()
+		canvas.FillText("Stop counting!", 10, 50)
+
 	}()
 
 	keepalive()
