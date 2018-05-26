@@ -2,7 +2,9 @@ package main
 
 import (
 	"math"
+	"strconv"
 	"syscall/js"
+	"time"
 
 	"lazyhackergo.com/browser"
 )
@@ -42,7 +44,7 @@ func main() {
 	window.Document.GetElementById("quit").AddEventListener(browser.EventClick, q)
 	//js.Global.Get("document").Call("getElementById", "quit").Call("addEventListener", "click", js.ValueOf(q))
 
-	window.Alert("hello, browser")
+	window.Alert("Triggered from Go WASM module")
 	window.Console.Info("hello, browser console")
 
 	canvas, err := window.Document.GetElementById("testcanvas").ToCanvas()
@@ -50,8 +52,21 @@ func main() {
 		window.Console.Warn(err.Error())
 	}
 
+	canvas.Clear()
 	canvas.BeginPath()
 	canvas.Arc(100, 75, 50, 0, 2*math.Pi, false)
 	canvas.Stroke()
+	canvas.Font("30px Arial")
+
+	time.Sleep(5 * time.Second)
+	go func() {
+		for i := 0; i < 100; i++ {
+
+			canvas.Clear()
+			canvas.FillText(strconv.Itoa(i), 10, 50)
+			time.Sleep(1 * time.Second) // sleep allows the browser to take control otherwise the whole UI gets frozen.
+		}
+	}()
+
 	keepalive()
 }
