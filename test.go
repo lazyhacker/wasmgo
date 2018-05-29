@@ -31,6 +31,13 @@ func keepalive() {
 			break
 		}
 	}
+	// select {} also seems to work but the following doesn't:
+	// select {
+	//    case m <-signal:
+	//       // do something
+	//    default:
+	//       // wait
+	// }
 }
 
 func main() {
