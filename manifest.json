@@ -9,5 +9,5 @@
     }
   ],
   "start_url": "/wasm_exec.html",
-  "display": "standalone",
+  "display": "standalone"
 }
