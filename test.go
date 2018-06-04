@@ -1,4 +1,4 @@
-package main
+package main // import lazyhackergo.com/wasmgo
 
 import (
 	"math"

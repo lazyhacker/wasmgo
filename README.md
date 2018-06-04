@@ -1,25 +1,25 @@
 This is some experimental code for working with Go and WebAssembly.
 
-## Prerequisite
+Prerequisite
+------------
 
-As of this writing, the Go release doesn't support WebAssembly so the version of
-Go from neelance is needed.
+As of this writing, the Go release doesn't support WebAssembly so the version of Go from neelance is needed.
 
-See https://blog.lazyhacker.com/2018/05/webassembly-wasm-with-go.html for how to
-build Go with WASM.
+See https://blog.lazyhacker.com/2018/05/webassembly-wasm-with-go.html for how to build Go with WASM.
 
-## Install
+Install
+-------
 
 ```
-go get github.com/lazyhacker/wasmgo
-cd $GOPATH/src/github.com/lazyhacker/wasmgo
+go get lazyhackergo.com/wasmgo
+cd $GOPATH/src/lazyhackergo.com/wasmgo
 ./build.sh
 ```
 
-Note: build.sh assumes that the 'go' command is located in $HOME/go-wasm/bin.
-Make sure GOROOT is pointing to the 'go' command that has WASM support.
+Note: build.sh assumes that the 'go' command is located in $HOME/go-wasm/bin. Make sure GOROOT is pointing to the 'go' command that has WASM support.
 
-## Running
+Running
+-------
 
 The code needs to be served through a web server.
 
