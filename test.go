@@ -1,4 +1,4 @@
-package main // import lazyhackergo.com/wasmgo
+package main // import "lazyhackergo.com/wasmgo"
 
 import (
 	"math"
@@ -48,7 +48,7 @@ func keepalive() {
 }
 
 func main() {
-	q := js.NewEventCallback(false, false, false, cbQuit)
+	q := js.NewEventCallback(js.StopImmediatePropagation, cbQuit)
 	defer q.Close()
 
 	c := js.NewCallback(cb)
