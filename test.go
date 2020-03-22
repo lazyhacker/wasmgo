@@ -1,4 +1,4 @@
-package main // import "lazyhackergo.com/wasmgo"
+package main // import "lazyhacker.dev/wasmgo"
 
 import (
 	"math"
@@ -6,7 +6,7 @@ import (
 	"syscall/js"
 	"time"
 
-	"lazyhackergo.com/browser"
+	"lazyhacker.dev/browser"
 )
 
 var signal = make(chan int)

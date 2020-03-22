@@ -11,8 +11,8 @@ Install
 -------
 
 ```
-go get lazyhackergo.com/wasmgo
-cd $GOPATH/src/lazyhackergo.com/wasmgo
+go get lazyhacker.dev/wasmgo
+cd $GOPATH/src/lazyhacker.dev/wasmgo
 ./build.sh
 ```
 
