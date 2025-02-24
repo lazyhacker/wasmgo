@@ -1,0 +1,56 @@
+<!doctype html>
+<!--
+Copyright 2018 The Go Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<html>
+
+<head>
+    <title>Ivy WASM</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-light_blue.min.css" />
+    <link rel="stylesheet" type="text/css" href="ivy.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="wasm_exec.js"></script>
+    <script src="ivy.js"> </script>
+</head>
+
+<body>
+    <div class="mdl-grid mdl-grid--no-spacing mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Ivy</span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+          <!-- Navigation. We hide it in small screens. -->
+          <nav class="mdl-navigation mdl-layout--large-screen-only">
+            <button id="clear" class="mdl-button mdl-js-button mdl-js-ripple-effect">Clear</button>
+          </nav>
+        </div>
+      </header>
+      <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Ivy</span>
+        <nav class="mdl-navigation">
+          <a class="mdl-navigation__link" href="">Demo</a>
+          <a class="mdl-navigation__link" href="">About</a>
+          <a class="mdl-navigation__link" href="">Help</a>
+        </nav>
+      </div>
+      <main class="mdl-layout__content">
+        <p id="ivy-out" class="word-break"> </p>
+        <div class="mdl-cell mdl-cell--12-col mdl-textfield mdl-js-textfield bottom">
+            <input class="mdl-textfield__input" type="text" id="expression" value="">
+            <label class="mdl-textfield__label" for="expression" id="elabel">type an expression</label>
+        </div>
+        <div id="loadspinner" class="mdl-spinner mdl-js-spinner is-active"></div>
+      </main>
+    </div>
+</body>
+
+</html>

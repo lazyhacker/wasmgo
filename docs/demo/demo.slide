@@ -1,0 +1,81 @@
+Web App Without JavaScript
+Can Go be used instead?
+5 Jun 2018
+
+Hsin Tsao
+Google
+tsao@google.com
+
+* Experimentation
+
+Goal
+
+- Experiment to see how much can be built without having to deal with JavaScript.
+- Built with just a combination of HTML, CSS and Go.
+
+Non-Goal
+
+- Debate transpilers vs WASM.
+- Debate the value of JavaScript.
+- Make production ready code.
+
+* Disclaimer
+
+- Not completely true about the no Javascript part, but don't have to write it.
+- WASM MVP release is not meant to be doing what I'm doing.
+  - Future release that supports threads, direct API access is when it will be.
+- Go's WASM support isn't ready for production.
+- Built with neelance@ wasm-wip branch and not the current 1.11 branch.
+
+* Demo 1: Go as primary driver 
+
+.link https://lazyhackeratwork.github.io/wasm
+
+* HTML
+
+.code demo1_html
+  
+* Events, DOM, Browser Objects and Functions
+
+.code demo1.go /START DEMO1_2/,/END DEMO1_2/
+
+.code demo1.go /START DEMO1_1/,/END DEMO1_1/
+
+* Canvas, Go Routines, Sleep
+
+.code demo1.go /START DEMO1_3/,/END DEMO1_3/
+
+* Keep Alive
+
+.code demo1.go /START DEMO1_4/,/END DEMO1_4/
+
+* Ivy Demo
+
+.link https://lazyhackeratwork.github.io/ivy
+
+- No changes to the Ivy code.
+- FE Built with HTML + CSS + Go
+
+Background:
+
+.iframe https://www.youtube.com/embed/sQ6-HyPxHKg?t=21m43s 315 560
+
+* Setting up events
+
+.code demo2.go /START DEMO2_1/,/END DEMO2_1/
+
+* Respond to events
+
+.code demo2.go /START DEMO2_2/,/END DEMO2_2/
+
+* Last Demo.
+
+This whole demo!  I'm using a Chromebook so I can't run the present tool.  This presentation is present ported over as a WASM module running the browser.
+
+.link https://lazyhackeratwork.github.io/present
+
+  - Had to hack the code for loading .code snippets remotely
+    - no file system
+    - can't use http package
+  - No "install" step.
+  - Able to work offline (WIP)

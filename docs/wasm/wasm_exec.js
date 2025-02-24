@@ -16,11 +16,13 @@
 			},
 		};
 
+		const now = () => {
+			const [sec, nsec] = process.hrtime();
+			return sec * 1000 + nsec / 1000000;
+		};
 		global.performance = {
-			now() {
-				const [sec, nsec] = process.hrtime();
-				return sec * 1000 + nsec / 1000000;
-			},
+			timeOrigin: Date.now() - now(),
+			now: now,
 		};
 
 		const util = require("util");
@@ -41,11 +43,6 @@
 				}
 				return buf.length;
 			},
-			openSync(path, flags, mode) {
-				const err = new Error("not implemented");
-				err.code = "ENOSYS";
-				throw err;
-			},
 		};
 	}
 
@@ -54,15 +51,13 @@
 
 	global.Go = class {
 		constructor() {
-			this.argv = ["js"];
+			this.argv = [];
 			this.env = {};
 			this.exit = (code) => {
 				if (code !== 0) {
 					console.warn("exit code:", code);
 				}
 			};
-			this._callbackTimeouts = new Map();
-			this._nextCallbackTimeoutID = 1;
 
 			const mem = () => {
 				// The buffer may change when requesting more memory.
@@ -121,7 +116,6 @@
 				return decoder.decode(new DataView(this._inst.exports.mem.buffer, saddr, len));
 			}
 
-			const timeOrigin = Date.now() - performance.now();
 			this.importObject = {
 				go: {
 					// func wasmExit(code int32)
@@ -140,7 +134,7 @@
 
 					// func nanotime() int64
 					"runtime.nanotime": (sp) => {
-						setInt64(sp + 8, (timeOrigin + performance.now()) * 1000000);
+						setInt64(sp + 8, (performance.timeOrigin + performance.now()) * 1000000);
 					},
 
 					// func walltime() (sec int64, nsec int32)
@@ -150,22 +144,9 @@
 						mem().setInt32(sp + 16, (msec % 1000) * 1000000, true);
 					},
 
-					// func scheduleCallback(delay int64) int32
+					// func scheduleCallback(delay int64)
 					"runtime.scheduleCallback": (sp) => {
-						const id = this._nextCallbackTimeoutID;
-						this._nextCallbackTimeoutID++;
-						this._callbackTimeouts.set(id, setTimeout(
-							() => { this._resolveCallbackPromise(); },
-							getInt64(sp + 8) + 1, // setTimeout has been seen to fire up to 1 millisecond early
-						));
-						mem().setInt32(sp + 16, id, true);
-					},
-
-					// func clearScheduledCallback(id int32)
-					"runtime.clearScheduledCallback": (sp) => {
-						const id = mem().getInt32(sp + 8, true);
-						clearTimeout(this._callbackTimeouts.get(id));
-						this._callbackTimeouts.delete(id);
+						setTimeout(() => { this._resolveCallbackPromise(); }, getInt64(sp + 8));
 					},
 
 					// func getRandomData(r []byte)
@@ -173,48 +154,48 @@
 						crypto.getRandomValues(loadSlice(sp + 8));
 					},
 
-					// func boolVal(value bool) ref
+					// func boolVal(value bool) Value
 					"syscall/js.boolVal": (sp) => {
 						storeValue(sp + 16, mem().getUint8(sp + 8) !== 0);
 					},
 
-					// func intVal(value int) ref
+					// func intVal(value int) Value
 					"syscall/js.intVal": (sp) => {
 						storeValue(sp + 16, getInt64(sp + 8));
 					},
 
-					// func floatVal(value float64) ref
+					// func floatVal(value float64) Value
 					"syscall/js.floatVal": (sp) => {
 						storeValue(sp + 16, mem().getFloat64(sp + 8, true));
 					},
 
-					// func stringVal(value string) ref
+					// func stringVal(value string) Value
 					"syscall/js.stringVal": (sp) => {
 						storeValue(sp + 24, loadString(sp + 8));
 					},
 
-					// func valueGet(v ref, p string) ref
-					"syscall/js.valueGet": (sp) => {
+					// func (v Value) Get(key string) Value
+					"syscall/js.Value.Get": (sp) => {
 						storeValue(sp + 32, Reflect.get(loadValue(sp + 8), loadString(sp + 16)));
 					},
 
-					// func valueSet(v ref, p string, x ref)
-					"syscall/js.valueSet": (sp) => {
+					// func (v Value) set(key string, value Value)
+					"syscall/js.Value.set": (sp) => {
 						Reflect.set(loadValue(sp + 8), loadString(sp + 16), loadValue(sp + 32));
 					},
 
-					// func valueIndex(v ref, i int) ref
-					"syscall/js.valueIndex": (sp) => {
+					// func (v Value) Index(i int) Value
+					"syscall/js.Value.Index": (sp) => {
 						storeValue(sp + 24, Reflect.get(loadValue(sp + 8), getInt64(sp + 16)));
 					},
 
-					// valueSetIndex(v ref, i int, x ref)
-					"syscall/js.valueSetIndex": (sp) => {
+					// func (v Value) setIndex(i int, value Value)
+					"syscall/js.Value.setIndex": (sp) => {
 						Reflect.set(loadValue(sp + 8), getInt64(sp + 16), loadValue(sp + 24));
 					},
 
-					// func valueCall(v ref, m string, args []ref) (ref, bool)
-					"syscall/js.valueCall": (sp) => {
+					// func (v Value) call(name string, args []Value) (Value, bool)
+					"syscall/js.Value.call": (sp) => {
 						try {
 							const v = loadValue(sp + 8);
 							const m = Reflect.get(v, loadString(sp + 16));
@@ -227,8 +208,8 @@
 						}
 					},
 
-					// func valueInvoke(v ref, args []ref) (ref, bool)
-					"syscall/js.valueInvoke": (sp) => {
+					// func (v Value) invoke(args []Value) (Value, bool)
+					"syscall/js.Value.invoke": (sp) => {
 						try {
 							const v = loadValue(sp + 8);
 							const args = loadSliceOfValues(sp + 16);
@@ -240,8 +221,8 @@
 						}
 					},
 
-					// func valueNew(v ref, args []ref) (ref, bool)
-					"syscall/js.valueNew": (sp) => {
+					// func (v Value) new(args []Value) (Value, bool)
+					"syscall/js.Value.new": (sp) => {
 						try {
 							const v = loadValue(sp + 8);
 							const args = loadSliceOfValues(sp + 16);
@@ -253,35 +234,35 @@
 						}
 					},
 
-					// func valueFloat(v ref) float64
-					"syscall/js.valueFloat": (sp) => {
+					// func (v Value) Float() float64
+					"syscall/js.Value.Float": (sp) => {
 						mem().setFloat64(sp + 16, parseFloat(loadValue(sp + 8)), true);
 					},
 
-					// func valueInt(v ref) int
-					"syscall/js.valueInt": (sp) => {
+					// func (v Value) Int() int
+					"syscall/js.Value.Int": (sp) => {
 						setInt64(sp + 16, parseInt(loadValue(sp + 8)));
 					},
 
-					// func valueBool(v ref) bool
-					"syscall/js.valueBool": (sp) => {
+					// func (v Value) Bool() bool
+					"syscall/js.Value.Bool": (sp) => {
 						mem().setUint8(sp + 16, !!loadValue(sp + 8));
 					},
 
-					// func valueLength(v ref) int
-					"syscall/js.valueLength": (sp) => {
+					// func (v Value) Length() int
+					"syscall/js.Value.Length": (sp) => {
 						setInt64(sp + 16, parseInt(loadValue(sp + 8).length));
 					},
 
-					// valuePrepareString(v ref) (ref, int)
-					"syscall/js.valuePrepareString": (sp) => {
+					// func (v Value) prepareString() (Value, int)
+					"syscall/js.Value.prepareString": (sp) => {
 						const str = encoder.encode(String(loadValue(sp + 8)));
 						storeValue(sp + 16, str);
 						setInt64(sp + 24, str.length);
 					},
 
-					// valueLoadString(v ref, b []byte)
-					"syscall/js.valueLoadString": (sp) => {
+					// func (v Value) loadString(b []byte)
+					"syscall/js.Value.loadString": (sp) => {
 						const str = loadValue(sp + 8);
 						loadSlice(sp + 16).set(str);
 					},
@@ -300,9 +281,9 @@
 				null,
 				global,
 				this._inst.exports.mem,
-				() => { // resolveCallbackPromise
+				() => {
 					if (this.exited) {
-						throw new Error("bad callback: Go program has already exited");
+						throw new Error('bad callback: Go program has already exited (hint: use "select {}")');
 					}
 					setTimeout(this._resolveCallbackPromise, 0); // make sure it is asynchronous
 				},
@@ -374,7 +355,6 @@
 			return go.run(result.instance);
 		}).catch((err) => {
 			console.error(err);
-			go.exited = true;
 			process.exit(1);
 		});
 	}

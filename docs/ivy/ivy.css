@@ -1,0 +1,20 @@
+p {
+  width: 100%;
+}
+.word-break {
+  word-break: break-all;
+}
+
+#bottom {
+  position: absolute;
+  bottom: 0;
+}
+
+#hide {
+  display: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}

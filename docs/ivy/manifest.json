@@ -1,0 +1,21 @@
+{
+  "short_name": "Ivy",
+  "name": "Ivy Interpreter",
+  "icons": [
+    {
+      "src": "images/ivy-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "images/ivy-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#3367D6",
+  "display": "standalone",
+  "scope": "/ivy",
+  "theme_color": "#3367D6"
+}
