@@ -27,3 +27,8 @@ The code needs to be served through a web server.
 go install lazyhackergo/simplehttpserver
 $GOPATH/bin/simplehttpserver
 ```
+
+Demo
+----
+
+See the demos in your browser at https://www.lazyhacker.com/wasmgo
